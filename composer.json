@@ -27,7 +27,8 @@
     ],
     "psr-4": {
       "Dubbo\\": "src/rpc",
-      "Dubbo\\Agent\\": "src/agent"
+      "Dubbo\\Agent\\": "src/agent",
+      "DubboDemo\\": "demo"
     }
   }
 }

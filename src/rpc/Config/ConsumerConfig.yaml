@@ -14,5 +14,5 @@ parameter:
   timeout: 3
   client_ip: "172.16.81.53"
 reference:
-  "com.imooc.springboot.dubbo.demo.ObjectDemoService":
+  "php.dubbo.demo.DemoService":
 

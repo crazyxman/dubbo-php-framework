@@ -28,4 +28,4 @@ provider:
   group:
   version: ""
 service:
-  namespace: "Demo\\User"
+  namespace: "DubboDemo\\Service\\"

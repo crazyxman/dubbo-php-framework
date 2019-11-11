@@ -12,9 +12,62 @@
   +----------------------------------------------------------------------+
 */
 
-include __DIR__ . "/../../vendor/autoload.php";
+include __DIR__ . "/../../../../vendor/autoload.php";
 
 use Dubbo\Agent\Bootstrap;
 
-$bootstrap = new Bootstrap('../src/agent/Config/AgentConfig.yaml');
-$bootstrap->run();
+class DubboAgent
+{
+    public function checkEnvironment()
+    {
+        if (php_sapi_name() != 'cli') {
+            exit("Must be run in php cli mode! \n");
+        }
+        $req_extension = '';
+        if (!extension_loaded('swoole')) {
+            $req_extension .= 'swoole ';
+        }
+        if (!extension_loaded('yaml')) {
+            $req_extension .= ' yaml';
+        }
+        if ($req_extension) {
+            exit("Need {$req_extension} extension! \n");
+        }
+    }
+
+    public function getOpt()
+    {
+        if (false) {
+            help:
+            $help = <<<HELP
+Usage:
+    php DubboManager.php [-h] [-y filename]
+Options:
+    -y filename            : This is a agent config file
+    -h                     : Display this help message \n
+HELP;
+            exit($help);
+        }
+        $options = getopt("y:h");
+        if (isset($options['h'])) {
+            goto help;
+        }
+        $y = $options['y'] ?? '';
+        if (is_file($y)) {
+            $bootstrap = new Bootstrap($y);
+            $bootstrap->run();
+            return;
+        }
+        goto help;
+    }
+
+    public static function run()
+    {
+        $instance = new self();
+        $instance->checkEnvironment();
+        $instance->getOpt();
+    }
+}
+
+DubboAgent::run();
+

@@ -2,7 +2,7 @@ application:
   name: "dubbo-agent"
   log_dir: "./logs"
   log_level: "INFO"
-  consumer_config_file: "/src/rpc/Config/ConsumerConfig.yaml"
+  consumer_config_file: "../src/rpc/Config/ConsumerConfig.yaml"
 registry:
   protocol: "zookeeper"
   address: "127.0.0.1:2181"

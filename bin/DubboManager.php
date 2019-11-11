@@ -12,7 +12,11 @@
   +----------------------------------------------------------------------+
 */
 
-include __DIR__ . "/../../vendor/autoload.php";
+if (!defined('VENDOR_DIR')) {
+    define("VENDOR_DIR", __DIR__ . '/../../../');
+}
+
+include VENDOR_DIR . "/autoload.php";
 
 use Dubbo\Provider\Startup;
 use Dubbo\Provider\Server\SwooleServer;

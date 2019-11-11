@@ -36,7 +36,7 @@ class Service
 
     public function load()
     {
-        $autoloadPsr4 = include __DIR__ . '/../../../../vendor/composer/autoload_psr4.php';
+        $autoloadPsr4 = include VENDOR_DIR . '/composer/autoload_psr4.php';
         $namespace = $namespaceDup = trim($this->_ymlParser->getServiceNamespace(), '\\');
         do {
             $paths = $autoloadPsr4[$namespaceDup . '\\'] ?? [];
