@@ -9,9 +9,6 @@
     "php-rpc"
   ],
   "homepage": "https://github.com/crazyxman/dubbo-php-framework",
-  "license": [
-    "Apache 2.0"
-  ],
   "authors": [
     {
       "name": "crazyxman",
