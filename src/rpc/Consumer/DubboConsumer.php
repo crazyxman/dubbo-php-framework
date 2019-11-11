@@ -57,6 +57,9 @@ class DubboConsumer
     {
         $reference = $this->_ymlParser->getReference();
         $serviceConfig = $reference[$service] ?? [];
+        if (!$serviceConfig) {
+            throw new DubboException("Unable to find '{$service}' service in configuration file");
+        }
         foreach ($this->_ymlParser->getParameter() as $key => $value) {
             if (!isset($serviceConfig[$key])) {
                 $serviceConfig[$key] = $value;
