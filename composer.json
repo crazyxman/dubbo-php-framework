@@ -21,7 +21,6 @@
   ],
   "require": {
     "php": ">=7.0.0",
-    "swoole": ">=4.4.3",
     "crazyxman/hessian-parser": ">=1.0.0",
     "doctrine/annotations": "v1.8.0"
   },
