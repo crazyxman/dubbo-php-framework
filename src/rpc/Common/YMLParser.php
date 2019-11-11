@@ -145,12 +145,12 @@ class YMLParser
 
     public function getApplicationLoggerFile()
     {
-        return $this->_application['logger_file'] ?? '.';
+        return $this->_application['log_file'] ?? '.';
     }
 
     public function getApplicationLoggerLevel()
     {
-        return $this->_application['logger_level'] ?? 'INFO';
+        return $this->_application['log_level'] ?? 'INFO';
     }
 
     public function getDiscovererHost()

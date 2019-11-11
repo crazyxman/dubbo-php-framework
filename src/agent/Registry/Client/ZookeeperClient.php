@@ -69,7 +69,7 @@ class ZookeeperClient extends BaseClient
     {
         $providerPath = '/dubbo/' . $service . '/providers';
         if (!$this->_client->exists($providerPath)) {
-            throw new DubboAgentException("not found node:$providerPath\n");
+            LoggerFacade::getLogger()->error('not found node.', $providerPath);
         }
         $zk_providers = $this->_client->getchildren($providerPath, function ($type, $state, $path) use ($service) {
             LoggerFacade::getLogger()->info('zookeeper getchildren() callback.', $type, $state, $path);

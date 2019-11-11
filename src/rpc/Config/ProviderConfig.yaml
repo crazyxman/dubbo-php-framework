@@ -10,8 +10,8 @@ parameter:
 application:
   name: "simple-monitor"
   environment: "develop"
-  logger_file: "./logs"
-  logger_level: "INFO"
+  log_file: "./logs"
+  log_level: "INFO"
 protocol:
   host: "127.0.0.1"
   port: "6380"

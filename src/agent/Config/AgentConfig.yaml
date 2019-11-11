@@ -1,8 +1,8 @@
 application:
   name: "dubbo-agent"
-  log_level: "INFO"
   log_dir: "./logs"
-  consumer_config_file: "/data/workspace/localhost/dubbo-php-new/src/rpc/Config/ConsumerConfig.yaml"
+  log_level: "INFO"
+  consumer_config_file: "/src/rpc/Config/ConsumerConfig.yaml"
 registry:
   protocol: "zookeeper"
   address: "127.0.0.1:2181"
