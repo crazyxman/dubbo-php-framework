@@ -20,8 +20,9 @@ class Demo
         return "Dubbo sayHello!";
     }
 
-    public function sadfa()
+    public static function dubboEntrance($method, $args, $server, $fd, $reactor_id)
     {
-
+        $_self = new self();
+        return $_self->$method($args);
     }
 }

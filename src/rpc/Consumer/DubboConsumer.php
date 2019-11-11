@@ -56,10 +56,10 @@ class DubboConsumer
     public function loadService($service)
     {
         $reference = $this->_ymlParser->getReference();
-        $serviceConfig = $reference[$service] ?? [];
-        if (!$serviceConfig) {
+        if (!array_key_exists($service, $reference)) {
             throw new DubboException("Unable to find '{$service}' service in configuration file");
         }
+        $serviceConfig = $reference[$service] ?: [];
         foreach ($this->_ymlParser->getParameter() as $key => $value) {
             if (!isset($serviceConfig[$key])) {
                 $serviceConfig[$key] = $value;
