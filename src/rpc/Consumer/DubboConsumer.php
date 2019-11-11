@@ -28,15 +28,15 @@ class DubboConsumer
 
     private $_discoverer = null;
 
-    private function __construct($filename = null)
+    private function __construct($config = null)
     {
-        if (is_null($filename)) {
+
+        if (is_null($config)) {
             $this->_ymlParser = new YMLParser(__DIR__ . '/../Config/ConsumerConfig.yaml');
-        } elseif (is_file($filename)) {
-            $this->_ymlParser = new YMLParser($filename);
-        } else {
-            throw new DubboException("filename:'{$filename}' is not a file");
+        }  else {
+            $this->_ymlParser = new YMLParser($config);
         }
+
         $this->_ymlParser->consumerRequired();
         $this->_discoverer = new RemoteSwTable($this->_ymlParser);
     }

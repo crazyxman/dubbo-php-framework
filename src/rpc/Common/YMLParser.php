@@ -30,15 +30,21 @@ class YMLParser
     private $_discoverer;
     private $_reference;
 
-    public function __construct($filename)
+    public function __construct($config)
     {
-        if (!is_readable($filename)) {
-            throw new DubboAgentException(" '{$filename}' is not a file or unreadable");
+
+        if (is_string($config)) {
+            if (!is_readable($config)) {
+                throw new DubboException(" '{$config}' is not a file or unreadable");
+            }
+            $config = yaml_parse_file($config);
+            if (!$config) {
+                throw new DubboException(" '{$config}' parsing failed");
+            }
+        } else if (!is_array($config)) {
+            throw new DubboException(" '{$config}' must be an array or file");
         }
-        $config = yaml_parse_file($filename);
-        if (!$config) {
-            throw new DubboAgentException(" '{$filename}' parsing failed");
-        }
+
         $this->_swoole_settings = $config['swoole_settings'] ?? [];
         $this->_parameter = $config['parameter'] ?? [];
         $this->_application = $config['application'] ?? [];
