@@ -125,6 +125,7 @@ class DubboProtocol
 
     public function unpackResponse($fullData)
     {
+        LoggerFacade::getLogger()->debug('Dubbo Response Data.', $fullData);
         $serializationId = $this->getSerializationId();
         if ($serializationId == Hessian2::HESSIAN2_SERIALIZATION_ID) {
             $serializationClass = Hessian2::class;

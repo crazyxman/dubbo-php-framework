@@ -12,9 +12,8 @@
   +----------------------------------------------------------------------+
 */
 
-if (!defined('VENDOR_DIR')) {
-    define("VENDOR_DIR", __DIR__ . '/../../../');
-}
+
+define("VENDOR_DIR", __DIR__ . '/../../../');
 
 include VENDOR_DIR . "/autoload.php";
 

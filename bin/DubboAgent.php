@@ -12,7 +12,9 @@
   +----------------------------------------------------------------------+
 */
 
-include __DIR__ . "/../../../../vendor/autoload.php";
+define("VENDOR_DIR", __DIR__ . '/../../../');
+
+include VENDOR_DIR . "/autoload.php";
 
 use Dubbo\Agent\Bootstrap;
 

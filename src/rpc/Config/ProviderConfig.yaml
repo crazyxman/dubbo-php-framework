@@ -21,9 +21,9 @@ protocol:
 registry:
   protocol: "zookeeper"
   address: "127.0.0.1:2181,127.0.0.1:2182"
-monitor:
-  protocol: "registry"
-  address:
+#monitor:
+#  protocol: "registry"
+#  address:
 provider:
   group:
   version: ""

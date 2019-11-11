@@ -43,7 +43,7 @@ class DubboResponse
     {
         $status = $this->_protocol->getStatus();
         if ($status != self::STATUS_OK) {
-            throw new DubboException("Dubbo returns header status error. status:{$status}", $status);
+            throw new DubboException("Dubbo returns exception. Exception:{$this->_responseData}", $status);
         }
         list($status, $content) = $this->_responseData;
         switch ($status) {
