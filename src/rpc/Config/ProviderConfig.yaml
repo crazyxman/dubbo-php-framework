@@ -1,0 +1,31 @@
+swoole_settings:
+  reactor_num: 2
+  worker_num: 2
+  user: devops
+  group: devops
+  daemonize: 0
+parameter:
+  dubbo_version: "2.0.0"
+  monitor_service: "com.alibaba.dubbo.monitor.MonitorService"
+application:
+  name: "simple-monitor"
+  environment: "develop"
+  logger_file: "./logs"
+  logger_level: "INFO"
+protocol:
+  host: "127.0.0.1"
+  port: "6380"
+  server: "swoole"
+  register: "true"
+  serialization: "fastjson"
+registry:
+  protocol: "zookeeper"
+  address: "127.0.0.1:2181,127.0.0.1:2182"
+monitor:
+  protocol: "registry"
+  address:
+provider:
+  group:
+  version: ""
+service:
+  namespace: "Demo\\User"

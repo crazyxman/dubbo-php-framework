@@ -1,0 +1,18 @@
+discoverer:
+  host: "127.0.0.1"
+  port: "9091"
+  retry: 1
+application:
+  name: "simple-monitor"
+  environment: "develop"
+  logger_file: "."
+  logger_level: "DEBUG"
+parameter:
+  version:
+  group:
+  retries: 0
+  timeout: 3
+  client_ip: "172.16.81.53"
+reference:
+  "com.imooc.springboot.dubbo.demo.ObjectDemoService":
+

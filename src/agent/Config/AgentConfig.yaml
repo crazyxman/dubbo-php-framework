@@ -1,0 +1,17 @@
+application:
+  name: "dubbo-agent"
+  log_level: "INFO"
+  log_dir: "./logs"
+  consumer_config_file: "/data/workspace/localhost/dubbo-php-new/src/rpc/Config/ConsumerConfig.yaml"
+registry:
+  protocol: "zookeeper"
+  address: "127.0.0.1:2181"
+server:
+  host: "0.0.0.0"
+  port: "9091"
+  daemonize: 0
+swoole_table:
+  size: 1000
+  column_size: 10240
+watch_nodes:
+  - "com.imooc.springboot.dubbo.demo.ObjectDemoService"
