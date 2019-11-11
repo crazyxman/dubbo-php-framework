@@ -1,6 +1,5 @@
 {
   "name": "dubbo-php-framework",
-  "type": "library",
   "description": "This is a php implementation of the dubbo framework",
   "keywords": [
     "dubbo",
