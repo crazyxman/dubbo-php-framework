@@ -42,7 +42,7 @@ class LoggerSimple implements LoggerInterface
 
     public function __construct(YMLParser $ymlParser)
     {
-        $logDir = $ymlParser->getApplicationLoggerFile();
+        $logDir = $ymlParser->getApplicationLogDir();
         if (!is_dir($logDir) && !mkdir($logDir, 0755, true)) {
             throw new DubboException("Create log directory '{$logDir}' fail");
         }

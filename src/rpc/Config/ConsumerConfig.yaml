@@ -5,7 +5,7 @@ discoverer:
 application:
   name: "simple-monitor"
   environment: "develop"
-  log_file: "."
+  log_dir: "."
   log_level: "DEBUG"
 parameter:
   version:

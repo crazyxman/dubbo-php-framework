@@ -149,9 +149,9 @@ class YMLParser
         return $this->_parameter['client_ip'] ?? swoole_get_local_ip();
     }
 
-    public function getApplicationLoggerFile()
+    public function getApplicationLogDir()
     {
-        return $this->_application['log_file'] ?? '.';
+        return $this->_application['log_dir'] ?? '.';
     }
 
     public function getApplicationLoggerLevel()
