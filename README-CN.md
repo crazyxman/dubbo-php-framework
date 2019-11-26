@@ -1,4 +1,4 @@
-English | [中文](./README-CN.md)
+[English](./README.md) | 中文
 
 # dubbo-php-framework
 
