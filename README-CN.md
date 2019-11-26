@@ -6,7 +6,7 @@ dubbo-php-framework 使用Swoole实现的RPC通信框架,它与Dubbo协议完全
 
 ![arch](https://github.com/crazyxman/dubbo-php-framework/blob/master/Arch.png)
 
-# Introduction
+# 介绍
 - provider在多进程中运行、工作进程用于处理特定的业务，管理进程控制工作进程的生命周期，主进程处理网络IO。
 - agent监视注册中心中提供者地址信息的更改，并将其同步到本地内存，以供consumer使用。
 - consumer与agent配合使用,通过TCP或UnixSocket从agent中获取提供者地址。
