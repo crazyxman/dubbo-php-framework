@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -18,6 +18,7 @@ use Dubbo\Agent\Server\SwooleServer;
 use Dubbo\Agent\Registry\RegistryFactory;
 use Dubbo\Agent\Logger\LoggerFacade;
 use Dubbo\Agent\Logger\LoggerSimple;
+use Dubbo\Agent\DubboAgentException;
 
 class Bootstrap
 {
@@ -32,12 +33,24 @@ class Bootstrap
     public function run()
     {
         $callbackList = [
-            'registry' => function(){
+            'registry' => function () {
                 return RegistryFactory::getInstance($this->_ymlParser);
             },
         ];
         $server = new SwooleServer($this->_ymlParser, $callbackList);
+        $server->setPidHandle($this->getPidHandle());
         $server->startup();
+    }
+
+    public function getPidHandle()
+    {
+        $pidFile = $this->_ymlParser->getServerPidFile();
+        @mkdir(dirname($pidFile), true);
+        $fp = fopen($pidFile, 'cb');
+        if (flock($fp, LOCK_EX | LOCK_NB) === false) {
+            throw new DubboAgentException("'{$this->_ymlParser->getApplicationName()}' this agent has started\n");
+        }
+        return $fp;
     }
 
 }

@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -18,7 +18,7 @@ define("VENDOR_DIR", __DIR__ . '/../../../');
 include VENDOR_DIR . "/autoload.php";
 
 use Dubbo\Provider\Startup;
-use Dubbo\Provider\Server\SwooleServer;
+use Dubbo\Provider\Initialization;
 
 class DubboManager
 {
@@ -45,24 +45,58 @@ class DubboManager
             help:
             $help = <<<HELP
 Usage:
-    php DubboManager.php [-h] [-y filename]
+    php DubboManager.php [-h] [-y filename] [-y filename -s signal]
 Options:
     -y filename            : This is a provider config file
+    -s signal              : send signal to a master process: stop, reload 
     -h                     : Display this help message \n
 HELP;
             exit($help);
         }
-        $options = getopt("y:h");
+        $options = getopt("y:s:h");
         if (isset($options['h'])) {
             goto help;
         }
         $y = $options['y'] ?? '';
-        if (is_file($y)) {
-            $swooleServer = new SwooleServer($y);
-            $swooleServer->startUp();
-            return;
+        if (!is_file($y)) {
+            goto help;
         }
-        goto help;
+        try {
+            $initialization = new Initialization($y);
+        } catch (\Exception $exception) {
+            exit($exception->getMessage());
+        }
+        $s = $options['s'] ?? '';
+        if ($s) {
+            if (!$y) {
+                goto help;
+            }
+            if ($s != "stop" && $s != 'reload') {
+                goto help;
+            }
+            $pidFile = $initialization->getApplicationPidFile();
+            $fp = fopen($pidFile, 'cb');
+            if (flock($fp, LOCK_EX | LOCK_NB)) {
+                exit("'{$initialization->getApplicationName()}' this application dose not start\n");
+            }
+            $pid = $initialization->getPid();
+            if (!$pid) {
+                exit("No pid found in '{$pidFile}'");
+            }
+            if ($s == "stop") {
+                posix_kill($pid, SIGTERM);
+                return;
+            } elseif ($s == 'reload') {
+                posix_kill($pid, SIGUSR1);
+                return;
+            }
+        }
+        try {
+            $initialization->startServer();
+        } catch (\Exception $exception) {
+            exit($exception->getMessage());
+        }
+
     }
 
     public static function run()

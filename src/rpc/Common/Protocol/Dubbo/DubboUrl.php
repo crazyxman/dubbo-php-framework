@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -79,7 +79,7 @@ class DubboUrl
 
     public function buildUrl()
     {
-        $url = $this->_scheme . '://' . $this->_host . ':' . $this->_port . '/' . $this->_service . '?' . http_build_query($this->_query_args_name);
+        $url = $this->_scheme . '://' . $this->_host . ':' . $this->_port . '/' . $this->_service . '?' . http_build_query($this->_query_args_name) . '&timestamp=' . getMillisecond();
         return urlencode($url);
     }
 

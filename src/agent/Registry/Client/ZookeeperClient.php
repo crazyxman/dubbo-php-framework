@@ -8,17 +8,15 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
 namespace Dubbo\Agent\Registry\Client;
 
 use Dubbo\Agent\YMLParser;
-
 use Zookeeper;
 use ZookeeperConnectionException;
-use Dubbo\Agent\DubboAgentException;
 use Dubbo\Agent\Logger\LoggerFacade;
 
 class ZookeeperClient extends BaseClient
@@ -54,7 +52,8 @@ class ZookeeperClient extends BaseClient
     private function connect()
     {
         $this->_client->connect($this->_ymlParser->getRegistryAddress(), function ($type, $state, $path) {
-            LoggerFacade::getLogger()->info('zookeeper connect() callback.', $type, $state, $path);
+
+            LoggerFacade::getLogger()->info('zookeeper connect() callback.', $this->_eventType[$type], $this->_state[$state], $path);
             if ($state == Zookeeper::CONNECTED_STATE) {
                 foreach ($this->_ymlParser->getWatchNodes() as $service) {
                     $this->getProvider($service);
@@ -69,10 +68,11 @@ class ZookeeperClient extends BaseClient
     {
         $providerPath = '/dubbo/' . $service . '/providers';
         if (!$this->_client->exists($providerPath)) {
-            LoggerFacade::getLogger()->error('not found node.', $providerPath);
+            LoggerFacade::getLogger()->error('not found service.', $providerPath);
+            return;
         }
         $zk_providers = $this->_client->getchildren($providerPath, function ($type, $state, $path) use ($service) {
-            LoggerFacade::getLogger()->info('zookeeper getchildren() callback.', $type, $state, $path);
+            LoggerFacade::getLogger()->info('zookeeper getchildren() callback.', $this->_eventType[$type], $this->_state[$state], $path);
             if ($type == Zookeeper::CHILD_EVENT) {
                 $this->getProvider($service);
             }

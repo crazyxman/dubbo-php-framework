@@ -8,16 +8,15 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
 namespace Dubbo\Monitor;
 
+use Dubbo\Common\Logger\LoggerFacade;
 use Swoole\Table;
 use Dubbo\Common\YMLParser;
-use Dubbo\Registry\Client\ZookeeperClient;
-use Dubbo\Common\DubboException;
 use Dubbo\Common\Protocol\Dubbo\DubboRequest;
 use Dubbo\Common\Protocol\Dubbo\DubboParam;
 
@@ -26,6 +25,8 @@ class MonitorFilter
 
     private $_swTable;
     private $_ymlParser;
+    private $_registry;
+    private $_monitorService = 'com.alibaba.dubbo.monitor.MonitorService';
 
     const COLUMN_SUCCESS = 'success';
     const COLUMN_FAILURE = 'failure';
@@ -162,22 +163,18 @@ class MonitorFilter
         }
     }
 
-    public function collect($parameters)
+    public function send()
     {
-        static $_zookeeperClient;
         try {
-            if (!$this->_swTable->count()) {
+            $monitorProvider = $this->getMonitorProvider();
+            if (!$this->_swTable->count() || !$monitorProvider) {
                 return;
             }
-            if (is_null($_zookeeperClient)) {
-                $_zookeeperClient = new ZookeeperClient($this->_ymlParser);
-            }
-            $path = '/dubbo/' . $this->_ymlParser->getParameterMonitorService() . '/providers';
-            $children = $_zookeeperClient->getChildren($path);
-            if (!$children) {
-                throw new DubboException("Fail to get children for path:{$path}");
-            }
-            $dubboRequest = new DubboRequest($children, ['retry' => 1, 'timeout' => 1]);
+            $parameters = [
+                'application' => $this->_ymlParser->getApplicationName(),
+                'provider' => $this->_ymlParser->getProtocolHost() . ':' . $this->_ymlParser->getProtocolPort()
+            ];
+            $dubboRequest = new DubboRequest($monitorProvider, ['timeout' => 1]);
             foreach ($this->_swTable as $key => $value) {
                 list($service, $method) = explode('/', $key);
                 $tps = bcdiv($this->getCount($key), 60);
@@ -219,8 +216,38 @@ class MonitorFilter
                 $this->resetTable();
             }
         } catch (\Exception $exception) {
-            //todo log
+            LoggerFacade::getLogger()->error("Monitor exception: ", $exception);
         }
 
+    }
+
+    public function getMonitorProvider()
+    {
+        static $_path;
+        if (is_null($_path)) {
+            $_path = '/dubbo/' . $this->_ymlParser->getMonitorService($this->_monitorService) . '/providers';
+        }
+        return $this->_registry->getChildren($_path);
+    }
+
+    public function setRegistry($registry)
+    {
+        $this->_registry = $registry;
+
+    }
+
+    public function normalCollect($monitorKey, $startTime, $protocol)
+    {
+        $this->incrCount($monitorKey);
+        $this->incrSuccess($monitorKey);
+        $this->incrElapsed($monitorKey, $startTime);
+        $this->incrOutput($monitorKey, $protocol->getLen());
+    }
+
+    public function failureCollect($monitorKey, $startTime)
+    {
+        $this->incrCount($monitorKey);
+        $this->incrFailure($monitorKey);
+        $this->incrElapsed($monitorKey, $startTime);
     }
 }

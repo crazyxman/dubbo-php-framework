@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -69,8 +69,7 @@ class Hessian2
         }
         $decoder = new HessionDecoder();
         $decoder->feed($variablePart);
-        $_arr = $decoder->finalize();
-
+        $_arr = $decoder->finalize() ?: [];
         $this->setAttachments(DubboResponse::toArray(array_pop($_arr), true));
         $this->setDubboVersion($_arr[0] ?? '');
         $this->setServiceName($_arr[1] ?? '');

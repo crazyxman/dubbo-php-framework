@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -27,12 +27,12 @@ class SwooleClient
 
     private $_timeout;
 
-    public function __construct($host, $port, $timeout = NULL)
+    public function __construct($host, $port, $timeout = NULL, $type = SWOOLE_SOCK_TCP)
     {
         static $_clients = [];
         $key = $host . ':' . $port;
         if (!isset($_clients[$key])) {
-            $_clients[$key] = new Client(SWOOLE_SOCK_TCP);
+            $_clients[$key] = new Client($type, SWOOLE_SOCK_SYNC);
         }
         $this->_client = $_clients[$key];
         $this->_host = $host;
@@ -112,5 +112,20 @@ class SwooleClient
             DubboConsumer::logger()->warn("swoole close(). fail. " . __FILE__ . ':' . __LINE__);
         }
         return $stat;
+    }
+
+    public function getHost()
+    {
+        return $this->_host;
+    }
+
+    public function getPort()
+    {
+        return $this->_port;
+    }
+
+    public function getTimeout()
+    {
+        return $this->_timeout;
     }
 }

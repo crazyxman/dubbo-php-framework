@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -19,7 +19,7 @@ use Dubbo\Provider\Annotations\DubboMethodAnnotation;
 
 /**
  *
- * @DubboClassAnnotation(serviceAlias="php.dubbo.demo.DemoService")
+ * @DubboClassAnnotation(serviceAlias="php.dubbo.demo.DemoService", version="", group="")
  */
 class Demo
 {
@@ -32,9 +32,9 @@ class Demo
         return "Dubbo sayHello!";
     }
 
-    public static function dubboEntrance($method, $args, $server, $fd, $reactor_id)
+    public static function dubboIngress($method, $args, $server, $fd, $reactor_id)
     {
         $_self = new self();
-        return $_self->$method($args);
+        return call_user_func_array([$_self, $method], $args);
     }
 }

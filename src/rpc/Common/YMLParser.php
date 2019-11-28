@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -29,22 +29,36 @@ class YMLParser
     private $_service;
     private $_discoverer;
     private $_reference;
+    private $_configFile;
 
-    public function __construct($config)
+    public function __construct(string $configFile, string $cacheFile = null)
     {
-
-        if (is_string($config)) {
-            if (!is_readable($config)) {
-                throw new DubboException(" '{$config}' is not a file or unreadable");
-            }
-            $config = yaml_parse_file($config);
-            if (!$config) {
-                throw new DubboException(" '{$config}' parsing failed");
-            }
-        } else if (!is_array($config)) {
-            throw new DubboException(" '{$config}' must be an array or file");
+        $config = null;
+        if (is_file($cacheFile)) {
+            $config = include $cacheFile;
         }
-
+        if (!$config) {
+            $this->_configFile = $configFile;
+            $config = yaml_parse_file($configFile);
+            $reference = [];
+            foreach ($config['reference'] ?? [] as $key => $value) {
+                $service_name = $value['service_name'] ?? '';
+                if (!$service_name) {
+                    throw new DubboException("Please set 'reference.[{$key}].service_name' in the configuration file\n");
+                }
+                unset($value['service_name']);
+                $reference[$service_name] = $value;
+            }
+            if ($reference) {
+                $config['reference'] = $reference;
+            }
+            if ($cacheFile && $config) {
+                file_put_contents($cacheFile, '<?php return ' . var_export($config, true) . ';');
+            }
+        }
+        if (!$config) {
+            throw new DubboException(" '{$configFile}' parsing failed");
+        }
         $this->_swoole_settings = $config['swoole_settings'] ?? [];
         $this->_parameter = $config['parameter'] ?? [];
         $this->_application = $config['application'] ?? [];
@@ -65,6 +79,7 @@ class YMLParser
         $required_key .= $this->getRegistryAddress() ? '' : ' registry.address ';
         $required_key .= $this->getApplicationName() ? '' : ' application.name ';
         $required_key .= $this->getServiceNamespace() ? '' : ' service.namespace ';
+        $required_key .= $this->getApplicationPidFile() ? '' : ' application.pid_file ';
         if ($required_key) {
             throw new DubboException("Please set '{$required_key}' in the configuration file\n");
         }
@@ -139,9 +154,9 @@ class YMLParser
         return $this->_monitor['address'] ?? '';
     }
 
-    public function getParameterMonitorService()
+    public function getMonitorService($default = null)
     {
-        return $this->_parameter['monitor_service'] ?? '';
+        return $this->_parameter['service'] ?? $default;
     }
 
     public function getParameterClientIp()
@@ -149,14 +164,19 @@ class YMLParser
         return $this->_parameter['client_ip'] ?? swoole_get_local_ip();
     }
 
-    public function getApplicationLogDir()
+    public function getApplicationLogDir($default = './logs')
     {
-        return $this->_application['log_dir'] ?? '.';
+        return $this->_application['log_dir'] ?? $default;
     }
 
-    public function getApplicationLoggerLevel()
+    public function getApplicationLoggerLevel($default = 'INFO')
     {
-        return $this->_application['log_level'] ?? 'INFO';
+        return $this->_application['log_level'] ?? $default;
+    }
+
+    public function getApplicationPidFile()
+    {
+        return $this->_application['pid_file'];
     }
 
     public function getDiscovererHost()
@@ -174,6 +194,11 @@ class YMLParser
         return max(($this->_discoverer['retry'] ?? 0), 0);
     }
 
+    public function getDiscovererUnixSocket()
+    {
+        return $this->_discoverer['unixsocket'] ?? '';
+    }
+
     public function getReference()
     {
         return $this->_reference;
@@ -187,6 +212,16 @@ class YMLParser
     public function getSwooleSettings()
     {
         return $this->_swoole_settings;
+    }
+
+    public function getConfigFile()
+    {
+        return $this->_configFile;
+    }
+
+    public function generateCacheFile($cacheFile)
+    {
+
     }
 
 

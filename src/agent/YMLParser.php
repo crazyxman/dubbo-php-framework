@@ -8,13 +8,11 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
 namespace Dubbo\Agent;
-
-use Dubbo\Agent\DubboAgentException;
 
 class YMLParser
 {
@@ -24,7 +22,7 @@ class YMLParser
     private $_server;
     private $_swooleTable;
     private $_watchNodes;
-    private $_reference;
+    private $_reference = [];
     private $_filename;
 
     public function __construct($filename)
@@ -45,7 +43,21 @@ class YMLParser
         if (!$_arr) {
             throw new DubboAgentException("consumer_config_file: '{$consumerConfigFile}' parsing failed");
         }
-        $this->_reference = $_arr['reference'] ?? [];
+        $unixSocket = $this->getServerUnixSocket();
+        $fp = null;
+        if (!file_exists($unixSocket) && !($fp = @fopen($unixSocket, 'w'))) {
+            throw new DubboAgentException("Cannot create unixsocket file: '{$unixSocket}'");
+
+        }
+        if ($fp) {
+            fclose($fp);
+        }
+        foreach ($_arr['reference'] ?? [] as $value){
+            if($value['service_name']??''){
+                $this->_reference[] = $value['service_name'];
+            }
+
+        }
         $this->_filename = $filename;
     }
 
@@ -66,6 +78,9 @@ class YMLParser
         }
         if (!isset($_arr['server']['port']) || !$_arr['server']['port']) {
             $required_key .= 'server.port,';
+        }
+        if (!isset($_arr['server']['pid_file']) || !$_arr['server']['pid_file']) {
+            $required_key .= 'server.pid_file,';
         }
         if ($required_key) {
             throw new DubboAgentException("Please set '{$required_key}' in the configuration file");
@@ -131,6 +146,16 @@ class YMLParser
         return $this->_server['daemonize'];
     }
 
+    public function getServerUnixSocket()
+    {
+        return $this->_server['unixsocket'] ?? '';
+    }
+
+    public function getServerPidFile()
+    {
+        return $this->_server['pid_file'] ?? '';
+    }
+
     public function getSwooleTableSize($default = null)
     {
         if (!isset($this->_swooleTable['size']) || !$this->_swooleTable['size']) {
@@ -149,7 +174,7 @@ class YMLParser
 
     public function getWatchNodes()
     {
-        return array_unique(array_merge(array_keys($this->_reference), $this->_watchNodes));
+        return array_unique(array_merge($this->_reference, $this->_watchNodes));
     }
 
     public function getFilename()

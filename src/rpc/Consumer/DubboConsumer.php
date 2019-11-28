@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -28,24 +28,18 @@ class DubboConsumer
 
     private $_discoverer = null;
 
-    private function __construct($config = null)
+    private function __construct($config, $cacheFile)
     {
-
-        if (is_null($config)) {
-            $this->_ymlParser = new YMLParser(__DIR__ . '/../Config/ConsumerConfig.yaml');
-        }  else {
-            $this->_ymlParser = new YMLParser($config);
-        }
-
+        $this->_ymlParser = new YMLParser($config, $cacheFile);
         $this->_ymlParser->consumerRequired();
         $this->_discoverer = new RemoteSwTable($this->_ymlParser);
     }
 
-    public static function getInstance($config = null)
+    public static function getInstance($config = null, $cacheFile = null)
     {
         static $_instance = null;
         if (is_null($_instance)) {
-            $_instance = new self($config);
+            $_instance = new self($config, $cacheFile);
         }
         if (is_null(LoggerFacade::getLogger())) {
             LoggerFacade::setLogger(new LoggerSimple($_instance->_ymlParser));
@@ -68,7 +62,7 @@ class DubboConsumer
         if ($serviceConfig['url'] ?? false) {
             $providers[] = $serviceConfig['url'];
         } else {
-            $providers = $this->_discoverer->getProviders($service, $serviceConfig);
+            $providers = $this->_discoverer->getProviders($service, $serviceConfig['query'] ?? []);
         }
         if (!$providers) {
             throw new DubboException("No '{$service}' provider found");
@@ -76,4 +70,10 @@ class DubboConsumer
         $request = new DubboRequest($providers, $serviceConfig);
         return $request;
     }
+
+    public static function setConfigcache()
+    {
+
+    }
+
 }

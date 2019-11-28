@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -17,6 +17,7 @@ namespace Dubbo\Common\Protocol\Dubbo;
 
 use Icecave\Collections\Collection;
 use Icecave\Flax\UniversalObject;
+use Dubbo\Common\DubboException;
 
 class DubboParam
 {
@@ -69,13 +70,21 @@ class DubboParam
         return new UniversalObject($class, $prop);
     }
 
+    public static function Type($type, $value)
+    {
+        $paramObject = new self(null);
+        $paramObject->type = $type;
+        $paramObject->value = $value;
+        return $paramObject;
+    }
+
     /**
      *
      * @param mixed $arg
      * @return string
      * @throws ConsumerException
      */
-    public function argToType($param)
+    private function argToType(&$param)
     {
         $type = gettype($param);
         switch ($type) {
@@ -93,23 +102,26 @@ class DubboParam
                 }
             case 'object':
                 if ($param instanceof UniversalObject) {
-                    $className = $param->className();
+                    $dataType = $param->className();
+                } elseif ($param instanceof DubboParam) {
+                    $dataType = $param->type;
+                    $param = $param->value;
                 } else {
-                    $className = get_class($param);
+                    $dataType = get_class($param);
                 }
-                return 'L' . str_replace(['.', '\\'], '/', $className) . ';';
+                return 'L' . str_replace(['.', '\\'], '/', $dataType) . ';';
             default:
-                //throw Exception
-                //throw new ConsumerException("Handler for type {$type} not implemented");
+                throw new DubboException("Handler for type {$type} not implemented");
         }
     }
 
     public function typeRefs()
     {
         $typeRefs = '';
-        foreach ($this->params as $param) {
+        foreach ($this->params as &$param) {
             $typeRefs .= $this->argToType($param);
         }
+        unset($param);
         return $typeRefs;
     }
 

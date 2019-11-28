@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -36,33 +36,13 @@ class Service
 
     public function load()
     {
-        $autoloadPsr4 = include VENDOR_DIR . '/composer/autoload_psr4.php';
-        $namespace = $namespaceDup = trim($this->_ymlParser->getServiceNamespace(), '\\');
-        do {
-            $paths = $autoloadPsr4[$namespaceDup . '\\'] ?? [];
-            if ($paths) {
-                break;
-            }
-            $pos = strrpos($namespaceDup, '\\');
-            $namespaceDup = substr($namespaceDup, 0, $pos);
-        } while ($pos);
-        if (!$paths) {
-            throw new DubboException("'{$namespace}' namespace does not exist");
-        }
-        $pathSuffix = substr($namespace, strlen($namespaceDup));
-        $pathSuffix = str_replace('\\', '/', $pathSuffix);
-        $serviceClass = [];
-        foreach ($paths as $path) {
-            $this->_recursiveFound($path . $pathSuffix, strlen($path), $namespaceDup, $serviceClass);
-        }
-        if (!$serviceClass) {
-            throw new DubboException("No service available!");
-        }
+        $serviceClass = $this->loadServiceClass();
         $reader = new AnnotationReader();
         $reflectionClass = new \ReflectionClass(DubboClassAnnotation::class);
         $reader->getClassAnnotation($reflectionClass, DubboClassAnnotation::class);
         $reflectionMethod = new \ReflectionClass(DubboMethodAnnotation::class);
         $reader->getClassAnnotation($reflectionMethod, DubboMethodAnnotation::class);
+
         $serviceTable = [];
         foreach ($serviceClass as $class) {
             if (!class_exists($class)) {
@@ -83,7 +63,7 @@ class Service
             $isFoundEntrance = false;
             foreach ($reflectionMethods as $method) {
                 $methodName = $method->getName();
-                if ($methodName == 'dubboEntrance') {
+                if ($methodName == 'dubboIngress') {
                     $isStatic = $method->isStatic();
                     if (!$isStatic) {
                         throw new DubboException(" The '{$methodName}' method in the '{$class}' class is not static");
@@ -98,7 +78,7 @@ class Service
                 $methods[] = $methodName;
             }
             if (!$isFoundEntrance) {
-                throw new DubboException("No entry function 'dubboEntrance' found in the '{$class}' class");
+                throw new DubboException("No entry function 'dubboIngress' found in the '{$class}' class");
             }
             if ($methods) {
                 $dubboUrl = new DubboUrl;
@@ -119,6 +99,57 @@ class Service
         $this->_serviceTable = $serviceTable;
     }
 
+    private function getNamespacePath()
+    {
+        $namespace = trim($this->_ymlParser->getServiceNamespace(), '\\');
+        $autoloadPsr4 = include VENDOR_DIR . '/composer/autoload_psr4.php';
+
+        $namespacePrefix = $namespace;
+        do {
+            $paths = $autoloadPsr4[$namespacePrefix . '\\'] ?? [];
+            if ($paths) {
+                break;
+            }
+            $pos = strrpos($namespacePrefix, '\\');
+            $namespacePrefix = substr($namespacePrefix, 0, $pos);
+        } while ($pos);
+        if (!$paths) {
+            throw new DubboException("'{$namespace}' namespace does not exist");
+        }
+        $pathSuffix = substr($namespace, strlen($namespacePrefix));
+        $pathSuffix = str_replace('\\', '/', $pathSuffix);
+        return [$namespacePrefix, $pathSuffix, $paths];
+    }
+
+    public function loadDubboBootstrap()
+    {
+        list($namespacePrefix, $pathSuffix, $paths) = $this->getNamespacePath();
+        $isFoundBootstrap = false;
+        foreach ($paths as $path) {
+            $dubboBootstrapFile = $path . $pathSuffix . '/DubboBootstrap.php';
+            if (is_file($dubboBootstrapFile)) {
+                include $dubboBootstrapFile;
+                $isFoundBootstrap = true;
+            }
+        }
+        if (!$isFoundBootstrap) {
+            throw new DubboException("Initialization file not found: '{$dubboBootstrapFile}'");
+        }
+    }
+
+    private function loadServiceClass()
+    {
+        list($namespacePrefix, $pathSuffix, $paths) = $this->getNamespacePath();
+        $serviceClass = [];
+        foreach ($paths as $path) {
+            $this->_recursiveFound($path . $pathSuffix, strlen($path), $namespacePrefix, $serviceClass);
+        }
+        if (!$serviceClass) {
+            throw new DubboException("No service available!");
+        }
+        return $serviceClass;
+    }
+
     private function _recursiveFound($path, $len, $namespacePrefix, &$result)
     {
         $lists = glob("{$path}/*");
@@ -129,8 +160,10 @@ class Service
             if (is_file($val) && (substr($val, -4) == '.php')) {
                 $val = substr($val, 0, -4);
                 $item = substr($val, $len);
-                $namespace = str_replace('/', '\\', $item);
-                $result[] = $namespacePrefix . $namespace;
+                $class = $namespacePrefix . str_replace('/', '\\', $item);
+                if (class_exists($class, true)) {
+                    $result[] = $class;
+                }
             }
         }
     }
@@ -149,14 +182,14 @@ class Service
             throw new DubboException("Can't find '{$method}' method");
         }
         $version = $decoder->getServiceVersion();
-        if ($version != $dubboUrl->getVersion()) {
+        if ($version != '0.0.0' && $version != $dubboUrl->getVersion()) {
             throw new DubboException("Can't find '{$version}' version service");
         }
         $attachments = $decoder->getAttachments();
         if ($dubboUrl->getGroup() != ($attachments['group'] ?? '')) {
             throw new DubboException("Can't find '{$attachments['group']}' group service");
         }
-        $result = call_user_func_array([$class, 'dubboEntrance'], [$method, $decoder->getArguments() , $server , $fd , $reactor_id]);
+        $result = call_user_func_array([$class, 'dubboIngress'], [$method, $decoder->getArguments(), $server, $fd, $reactor_id]);
         $protocol->setStatus(DubboResponse::STATUS_OK);
         $protocol->setVariablePartType(DubboResponse::RESPONSE_VALUE);
         return $protocol->packResponse($result);
@@ -177,7 +210,7 @@ class Service
     }
 
 
-    public function getSwooleTable()
+    public function getServiceTable()
     {
         return $this->_serviceTable;
     }

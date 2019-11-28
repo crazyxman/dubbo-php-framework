@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -16,6 +16,7 @@ namespace Dubbo\Agent\Server;
 
 use Dubbo\Agent\YMLParser;
 use Dubbo\Agent\Registry\FilterProvider;
+use Dubbo\Agent\DubboAgentException;
 use Swoole\Server;
 use Swoole\Coroutine;
 
@@ -29,6 +30,12 @@ class SwooleServer
 
     private $_registry;
 
+    private $_host = '127.0.0.1'; //default
+
+    private $_port = '9091';
+
+    private $_pidHandle;
+
     public function __construct(YMLParser $ymlParser, $callbackList)
     {
         $this->_ymlParser = $ymlParser;
@@ -37,7 +44,12 @@ class SwooleServer
 
     public function startup()
     {
-        $this->_server = new Server('127.0.0.1', $this->_ymlParser->getServerPort(), SWOOLE_BASE);
+        $unixSocket = $this->_ymlParser->getServerUnixSocket();
+
+        $this->_server = new Server($this->_ymlParser->getServerHost($this->_host), $this->_ymlParser->getServerPort($this->_port), SWOOLE_BASE);
+        if ($unixSocket) {
+            $this->_server->addlistener($unixSocket, 0, SWOOLE_UNIX_STREAM);
+        }
         $this->_server->set(
             [
                 'daemonize' => $this->_ymlParser->getServerDaemonize(),
@@ -65,6 +77,9 @@ class SwooleServer
     {
         $this->_server->on('WorkerStart', function (Server $server, int $worker_id) {
             swoole_set_process_name("php-dubbo-agent.{$this->_ymlParser->getApplicationName()}: master process ({$this->_ymlParser->getFilename()})");
+            if (!ftruncate($this->_pidHandle, 0) || (fwrite($this->_pidHandle, $server->master_pid) === false)) {
+                $server->shutdown();
+            }
         });
     }
 
@@ -77,5 +92,9 @@ class SwooleServer
         });
     }
 
+    public function setPidHandle($fp)
+    {
+        $this->_pidHandle = $fp;
+    }
 
 }

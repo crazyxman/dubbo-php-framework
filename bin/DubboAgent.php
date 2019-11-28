@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -56,8 +56,12 @@ HELP;
         }
         $y = $options['y'] ?? '';
         if (is_file($y)) {
-            $bootstrap = new Bootstrap($y);
-            $bootstrap->run();
+            try{
+                $bootstrap = new Bootstrap($y);
+                $bootstrap->run();
+            }catch (\Exception $exception){
+                exit($exception->getMessage());
+            }
             return;
         }
         goto help;

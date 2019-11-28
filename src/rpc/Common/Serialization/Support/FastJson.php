@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -36,6 +36,9 @@ class FastJson
         $variablePart .= json_encode($request->getMethod()) . PHP_EOL;
         $variablePart .= json_encode($args->typeRefs()) . PHP_EOL;
         foreach ($args->getParams() as $arg) {
+            if (is_object($arg)) {
+                $arg = $this->universalObjectTostdClass($arg, new \stdClass());
+            }
             $variablePart .= json_encode($arg) . PHP_EOL;
         }
         $variablePart .= json_encode([
@@ -46,6 +49,32 @@ class FastJson
             'version' => $dubboUrl->getVersion()
         ]);
         return $variablePart;
+    }
+
+    public function universalObjectTostdClass($arg, $result)
+    {
+        foreach ($arg->object() as $key => $value) {
+            $type = gettype($value);
+            switch ($type) {
+                case 'boolean':
+                case 'integer':
+                case 'double':
+                case 'string':
+                case 'array':
+                    $result->$key = $value;
+                    break;
+                case 'object':
+                    $anonymousObject = $this->universalObjectTostdClass($value, new \stdClass());
+                    $count = count(get_object_vars($anonymousObject));
+                    if ($count == 1 && property_exists($anonymousObject, 'value')) {
+                        $result->$key = $anonymousObject->value;
+                    } else {
+                        $result->$key = $anonymousObject;
+                    }
+                    break;
+            }
+        }
+        return $result;
     }
 
     public function unserializeRequest(DubboProtocol $protocol, $variablePart)

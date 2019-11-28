@@ -8,7 +8,7 @@
   | available through the world-wide-web at the following url:           |
   | http://www.apache.org/licenses/LICENSE-2.0.html                      |
   +----------------------------------------------------------------------+
-  | Author: Jinxi Wang  <1054636713@qq.com>                              |
+  | Author: Jinxi Wang  <crazyxman01@gmail.com>                              |
   +----------------------------------------------------------------------+
 */
 
@@ -102,8 +102,9 @@ class DubboRequest
                     $len = 0;
                 }
                 $chunk = $sw_client->recv($readLen);
-                if ((getMillisecond() - $startTime) > $this->_serviceConfig['timeout']) {
+                if ((getMillisecond() - $startTime) > ($this->_serviceConfig['timeout'] * 1000)) {
                     $exceptionMsg = "Data too large to receive data timeout. line:" . __LINE__;
+                    goto _footer;
                 }
                 if ($chunk === false) {
                     $exceptionMsg = "Swoole recv() data timeout. line:" . __LINE__;
@@ -118,6 +119,7 @@ class DubboRequest
             retry:
             $index = ($index + 1) % count($this->_dubboUrls);
         } while ($retry-- > 0);
+        _footer:
         if ($exceptionMsg) {
             throw new DubboException("{$exceptionMsg}, host:{$host}:{$port}, timeout:{$timeout}!", DubboException::BAD_RESPONSE);
         }

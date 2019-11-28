@@ -7,11 +7,13 @@ registry:
   protocol: "zookeeper"
   address: "127.0.0.1:2181"
 server:
-  host: "0.0.0.0"
+  host: "127.0.0.1"
   port: "9091"
   daemonize: 0
+  unixsocket: "/var/run/dubbo-php-framework/dubbo-agent.sock"
+  pid_file: "/var/run/dubbo-php-framework/dubbo-agent.pid"
 swoole_table:
   size: 1000
   column_size: 10240
 watch_nodes:
-  - "com.imooc.springboot.dubbo.demo.ObjectDemoService"
+  - "php.dubbo.demo.DemoService"
