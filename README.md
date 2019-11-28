@@ -12,4 +12,19 @@ dubbo-php-framework is a RPC communication framework for PHP language. It is ful
 - consumer、 agent are deployed on all consumer machines and communicate with each other on unix socket or TCP socket
 provider is deployed on all provider machines to control the lifecycle of all php providers on that machine
 
+# Change
+- Rewrite the entire code, have better readability, and expand (help more people join in)
+- Introduce composer for management loading, which is beneficial for installation and use as a component of other frameworks.
+- The original agent module was changed from c + redis to php to reduce component dependencies.
+- Provider, consumer, agent and other configuration files are independent of each other, and the storage location is customized.
+- Configuration file format changed from ini to yaml, reducing redundant fields and improving readability.
+- Remove log4php log component, provide external log component implementation interface for custom implementation.
+- The provider module introduces annotations to register existing code as a dubbo service without modification, without intrusion.
+- The swoole_server configuration and callback function can be customized by the user, which is helpful for users to optimize the service according to the current application scenario.
+- The TCP connection is maintained while consuming the same ip: port provider.
+- The returned hessian serialized data is transformed from a complex object into an array after parsing.
+- The data collected by monitor is more complete.
+
+
 Wiki: [中文](https://github.com/crazyxman/dubbo-php-framework/wiki/%E4%B8%AD%E6%96%87)
+
