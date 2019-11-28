@@ -12,7 +12,7 @@ dubbo-php-framework is a RPC communication framework for PHP language. It is ful
 - consumer、 agent are deployed on all consumer machines and communicate with each other on unix socket or TCP socket
 provider is deployed on all provider machines to control the lifecycle of all php providers on that machine
 
-# Change
+# Changelog
 - Rewrite the entire code, have better readability, and expand (help more people join in)
 - Introduce composer for management loading, which is beneficial for installation and use as a component of other frameworks.
 - The original agent module was changed from c + redis to php to reduce component dependencies.
