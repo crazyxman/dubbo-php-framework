@@ -94,7 +94,7 @@ HELP;
         try {
             $initialization->startServer();
         } catch (\Exception $exception) {
-            exit($exception->getMessage());
+            exit($exception->getMessage()."\n");
         }
 
     }
