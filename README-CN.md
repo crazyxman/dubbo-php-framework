@@ -25,4 +25,4 @@ dubbo-php-framework 使用Swoole实现的RPC通信框架,它与Dubbo协议完全
 - 返回的hessian序列化数据解析后由复杂的对象转为了数组。
 - monitor 收集的数据更加完整。
 
-Wiki: [English](https://github.com/crazyxman/dubbo-php-framework/wiki/English).[中文](https://github.com/crazyxman/dubbo-php-framework/wiki/%E4%B8%AD%E6%96%87)
+Wiki: [中文](https://github.com/crazyxman/dubbo-php-framework/wiki/%E4%B8%AD%E6%96%87)
