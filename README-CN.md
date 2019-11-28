@@ -12,7 +12,7 @@ dubbo-php-framework 使用Swoole实现的RPC通信框架,它与Dubbo协议完全
 - agent监视注册中心中提供者地址信息的更改，并将其同步到本地内存，以供consumer使用。
 - consumer与agent配合使用,通过TCP或UnixSocket从agent中获取提供者地址。
 
-# 变化
+# 变更项
 - 重写了全部代码，拥有更好的可读性(有利于更多的人参与进来)。
 - 引入composer进行管理加载，利于安装及作为其他框架的一个组件使用。
 - 原有的agent模块由 c代码+redis 改为 纯php实现, 减少组件依赖，利于使用。
