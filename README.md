@@ -12,4 +12,4 @@ dubbo-php-framework is a RPC communication framework for PHP language. It is ful
 - consumer、 agent are deployed on all consumer machines and communicate with each other on unix socket or TCP socket
 provider is deployed on all provider machines to control the lifecycle of all php providers on that machine
 
-Wiki: [English](https://github.com/crazyxman/dubbo-php-framework/wiki/English).[中文](https://github.com/crazyxman/dubbo-php-framework/wiki/%E4%B8%AD%E6%96%87)
+Wiki: [中文](https://github.com/crazyxman/dubbo-php-framework/wiki/%E4%B8%AD%E6%96%87)
