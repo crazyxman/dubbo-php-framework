@@ -17,6 +17,7 @@ provider is deployed on all provider machines to control the lifecycle of all ph
 - Introduce composer for management loading, which is beneficial for installation and use as a component of other frameworks.
 - The original agent module was changed from c + redis to php to reduce component dependencies.
 - Provider, consumer, agent and other configuration files are independent of each other, and the storage location is customized.
+- Both provider and consumer support serialization of hessian2 data.
 - Configuration file format changed from ini to yaml, reducing redundant fields and improving readability.
 - Remove log4php log component, provide external log component implementation interface for custom implementation.
 - The provider module introduces annotations to register existing code as a dubbo service without modification, without intrusion.
