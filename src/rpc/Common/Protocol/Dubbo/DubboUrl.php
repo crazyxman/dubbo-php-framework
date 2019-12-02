@@ -58,13 +58,8 @@ class DubboUrl
     public function parseUrl($url)
     {
         $parts = parse_url($url);
-        if (!$parts) {
-            //todo log
-            return false;
-        }
-        if (($parts['scheme'] ?? '') != $this->_scheme || !isset($parts['host']) || !isset($parts['port']) || !isset($parts['path'])) {
-            //todo log
-            return false;
+        if (!$parts || (($parts['scheme'] ?? '') != $this->_scheme) || !isset($parts['host']) || !isset($parts['port']) || !isset($parts['path'])) {
+            throw new DubboException("'{$url}' is not a valid dubbo url");
         }
         $this->_service = substr($parts['path'], 1);
         $this->_host = $parts['host'];
