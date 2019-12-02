@@ -17,6 +17,7 @@ dubbo-php-framework 使用Swoole实现的RPC通信框架,它与Dubbo协议完全
 - 引入composer进行管理加载，利于安装及作为其他框架的一个组件使用。
 - 原有的agent模块由 c代码+redis 改为 纯php实现, 减少组件依赖，利于使用。
 - provider,consumer,agent等配置文件互相独立,存放位置自定义。
+- provider,consumer都支持了hessian2数据序列化。
 - 配置文件格式由ini改为yaml,减少冗余字段，可读性更高。
 - 去除log4php日志组件, 对外提供日志组件实现接口，用户可进行自定义实现。
 - provider模块引入注解可将现有代码基本无需修改即可注册为dubbo服务, 无侵入。
