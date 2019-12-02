@@ -2,7 +2,7 @@ English | [中文](./README-CN.md)
 
 # dubbo-php-framework
 
-dubbo-php-framework is a RPC communication framework for PHP language. It is fully compatible with Dubbo protocol, and can be used as provider terminal and consumer terminal simultaneously. Using zookeeper for service registration discovery, and using fastjson and hessian for Serialization
+dubbo-php-framework is a RPC communication framework for PHP language. It is fully compatible with Dubbo protocol, and can be used as provider terminal and consumer terminal simultaneously. Using zookeeper for service registration discovery, and using fastjson and hessian2 for Serialization
 
 ![arch](https://github.com/crazyxman/dubbo-php-framework/blob/master/Arch.png)
 
@@ -17,6 +17,7 @@ provider is deployed on all provider machines to control the lifecycle of all ph
 - Introduce composer for management loading, which is beneficial for installation and use as a component of other frameworks.
 - The original agent module was changed from c + redis to php to reduce component dependencies.
 - Provider, consumer, agent and other configuration files are independent of each other, and the storage location is customized.
+- Both provider and consumer support serialization of hessian2 data.
 - Configuration file format changed from ini to yaml, reducing redundant fields and improving readability.
 - Remove log4php log component, provide external log component implementation interface for custom implementation.
 - The provider module introduces annotations to register existing code as a dubbo service without modification, without intrusion.
