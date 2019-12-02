@@ -2,7 +2,7 @@
 
 # dubbo-php-framework
 
-dubbo-php-framework 使用Swoole实现的RPC通信框架,它与Dubbo协议完全兼容,并且可以同时作为消费者和提供者,使用Zookeeper用作服务注册发现,支持fastjson,hessian等数据序列化方式。<br /><br />
+dubbo-php-framework 使用Swoole实现的RPC通信框架,它与Dubbo协议完全兼容,并且可以同时作为消费者和提供者,使用Zookeeper用作服务注册发现,支持fastjson,hessian2等数据序列化方式。<br /><br />
 当前框架是对apache/dubbo-php-framework的重写。
 
 ![arch](https://github.com/crazyxman/dubbo-php-framework/blob/master/Arch.png)
