@@ -18,7 +18,6 @@ use Dubbo\Agent\Server\SwooleServer;
 use Dubbo\Agent\Registry\RegistryFactory;
 use Dubbo\Agent\Logger\LoggerFacade;
 use Dubbo\Agent\Logger\LoggerSimple;
-use Dubbo\Agent\DubboAgentException;
 
 class Bootstrap
 {

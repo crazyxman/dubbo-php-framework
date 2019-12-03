@@ -52,7 +52,6 @@ class ZookeeperClient extends BaseClient
     private function connect()
     {
         $this->_client->connect($this->_ymlParser->getRegistryAddress(), function ($type, $state, $path) {
-
             LoggerFacade::getLogger()->info('zookeeper connect() callback.', $this->_eventType[$type], $this->_state[$state], $path);
             if ($state == Zookeeper::CONNECTED_STATE) {
                 foreach ($this->_ymlParser->getWatchNodes() as $service) {

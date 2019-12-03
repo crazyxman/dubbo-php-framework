@@ -57,20 +57,7 @@ class SwooleServer
         );
         $this->onWorkerStart();
         $this->onReceive();
-        $this->registry();
         $this->_server->start();
-    }
-
-    private function registry()
-    {
-        if (isset($this->_callbackList['registry'])) {
-            go(function () {
-                $this->_registry = call_user_func($this->_callbackList['registry']);
-                while (true) {
-                    Coroutine::sleep(0.1);
-                }
-            });
-        }
     }
 
     public function onWorkerStart()
@@ -79,6 +66,12 @@ class SwooleServer
             swoole_set_process_name("php-dubbo-agent.{$this->_ymlParser->getApplicationName()}: master process ({$this->_ymlParser->getFilename()})");
             if (!ftruncate($this->_pidHandle, 0) || (fwrite($this->_pidHandle, $server->master_pid) === false)) {
                 $server->shutdown();
+            }
+            if (isset($this->_callbackList['registry'])) {
+                $this->_registry = call_user_func($this->_callbackList['registry']);
+                $this->_server->tick(60,function (){
+                    zookeeper_dispatch();
+                });
             }
         });
     }
