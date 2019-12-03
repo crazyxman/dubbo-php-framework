@@ -16,7 +16,7 @@ namespace Dubbo\Agent\Registry;
 
 use Dubbo\Agent\YMLParser;
 use Dubbo\Agent\Registry\Client\ZookeeperClient;
-use Dubbo\Agent\DubboAgentException;
+use Dubbo\Agent\Logger\LoggerFacade;
 
 class RegistryFactory
 {
@@ -29,11 +29,9 @@ class RegistryFactory
     public static function getInstance(YMLParser $ymlParser)
     {
         if (!$ymlParser->getWatchNodes()) {
-            throw new DubboAgentException();
+            LoggerFacade::getLogger()->error("No services found to subscribe");
         }
-        if ($ymlParser->getRegistryProtocol() == 'zookeeper') {
-            $instance = new ZookeeperClient($ymlParser);
-        }
+        $instance = new ZookeeperClient($ymlParser);
         return $instance;
     }
 
