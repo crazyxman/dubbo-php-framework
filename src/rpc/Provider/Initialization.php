@@ -45,7 +45,9 @@ class Initialization
 
     public function setLogger()
     {
-        LoggerFacade::setLogger(new LoggerSimple($this->_ymlParser));
+        if (is_null(LoggerFacade::getLogger())) {
+            LoggerFacade::setLogger(new LoggerSimple($this->_ymlParser));
+        }
     }
 
     private function loadService()
