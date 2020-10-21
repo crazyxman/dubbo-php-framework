@@ -88,7 +88,13 @@ class SwooleClient
 
     public function send($data)
     {
-        $stat = $this->_client->send($data);
+        try {
+            $stat = $this->_client->send($data);
+        }catch (\ErrorException $e){
+            $this->close();
+            $this->_client->connect($this->_host, $this->_port, $this->_timeout);
+            $stat = $this->send($data);
+        }
         if (!$stat) {
             LoggerFacade::getLogger()->warn("swoole send(). parameter: {$data} fail. " . __FILE__ . ':' . __LINE__);
         }
@@ -97,7 +103,13 @@ class SwooleClient
 
     public function recv($size = 65535)
     {
-        $data = $this->_client->recv($size);
+        try {
+            $data = $this->_client->recv($size);
+        }catch (\ErrorException $e){
+            $this->close();
+            $this->_client->connect($this->_host, $this->_port, $this->_timeout);
+            $data = $this->recv($size);
+        }
         if (!$data) {
             LoggerFacade::getLogger()->warn("swoole recv(). parameter: {$size} fail. " . __FILE__ . ':' . __LINE__);
         }
