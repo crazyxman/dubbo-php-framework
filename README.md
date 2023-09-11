@@ -1,3 +1,8 @@
+```html
+   This project is no longer maintained
+   此项目不再维护
+```
+
 English | [中文](./README-CN.md)
 
 # dubbo-php-framework
@@ -27,5 +32,5 @@ provider is deployed on all provider machines to control the lifecycle of all ph
 - The data collected by monitor is more complete.
 
 
-Wiki: [中文](https://github.com/crazyxman/dubbo-php-framework/wiki/%E4%B8%AD%E6%96%87)，QQ:1054636713
+Wiki: [中文](https://github.com/crazyxman/dubbo-php-framework/wiki/%E4%B8%AD%E6%96%87)
 
